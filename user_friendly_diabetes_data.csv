@@ -1,0 +1,11 @@
+Age,Weight,Height,Frequent_Urination,Excessive_Thirst,Fatigue,Exercise_Level,Family_History,Diabetes
+25,55,165,No,No,No,High,No,0
+45,85,172,Yes,Yes,Yes,Low,Yes,1
+52,90,168,Yes,Yes,Yes,Low,Yes,1
+33,68,160,No,Yes,Yes,Moderate,No,0
+60,95,170,Yes,Yes,Yes,Low,Yes,1
+29,60,158,No,No,No,High,No,0
+48,88,175,Yes,Yes,Yes,Low,Yes,1
+36,72,166,No,No,No,Moderate,No,0
+40,78,169,Yes,Yes,Yes,Low,Yes,1
+55,92,180,Yes,Yes,Yes,Low,Yes,1

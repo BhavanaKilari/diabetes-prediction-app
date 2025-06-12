@@ -2,6 +2,38 @@ import streamlit as st
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
+# Add background image and style
+st.markdown(
+    """
+    <style>
+    /* Background image */
+    [data-testid="stAppViewContainer"] > .main {
+        background-image: url("https://img.freepik.com/free-vector/health-medical-blue-background_1017-26807.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    /* Optional white background for content */
+    [data-testid="stSidebar"] {
+        background-color: rgba(255, 255, 255, 0.7);
+    }
+    .stApp {
+        background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Result text styling */
+    .big-font {
+        font-size: 28px !important;
+        font-weight: bold;
+        color: #1e90ff;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # ----- PAGE CONFIG -----
 st.set_page_config(

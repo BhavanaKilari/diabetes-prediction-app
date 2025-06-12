@@ -4,7 +4,24 @@ import numpy as np
 import joblib
 
 # Load the trained model
-model = joblib.load("diabetes_decision_tree_model.pkl")
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+
+# Sample dataset (use full CSV if needed)
+@st.cache_data
+def load_training_data():
+    df = pd.read_csv("user_friendly_diabetes_data.csv")
+    label_cols = ["Frequent_Urination", "Excessive_Thirst", "Fatigue", "Exercise_Level", "Family_History"]
+    for col in label_cols:
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col])
+    X = df.drop("Diabetes", axis=1)
+    y = df["Diabetes"]
+    model = DecisionTreeClassifier(random_state=42)
+    model.fit(X, y)
+    return model
+
+model = load_training_data()
 
 # App layout
 st.set_page_config(page_title="Diabetes Prediction App", layout="centered")

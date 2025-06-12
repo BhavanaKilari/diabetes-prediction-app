@@ -1,71 +1,75 @@
-# diabetes_prediction_app.py
-
 import streamlit as st
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-import joblib  # For saving/loading model
+import numpy as np
+import joblib
 
-# Load dataset
-@st.cache_data
-def load_data():
-    return pd.read_csv('diabetes.csv')
+# Load the trained model
+model = joblib.load("diabetes_decision_tree_model.pkl")
 
-df = load_data()
-
-# Split data
-X = df.drop('Outcome', axis=1)
-y = df['Outcome']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train model
-model = DecisionTreeClassifier()
-model.fit(X_train, y_train)
-
-# Accuracy
-accuracy = accuracy_score(y_test, model.predict(X_test))
-
-# Streamlit UI
+# App layout
+st.set_page_config(page_title="Diabetes Prediction App", layout="centered")
 st.title("🩺 Diabetes Prediction App")
-st.markdown("Predict the likelihood of having diabetes using simple medical inputs.")
+st.markdown("Enter your health details below to check your diabetes risk.")
 
-st.sidebar.header("User Input Parameters")
+# Input form
+with st.form("diabetes_form"):
+    age = st.number_input("Age", min_value=10, max_value=100, step=1)
+    weight = st.number_input("Weight (in kg)", min_value=30, max_value=200)
+    height = st.number_input("Height (in cm)", min_value=100, max_value=250)
 
-# Function to take user inputs
-def user_input():
-    pregnancies = st.sidebar.slider("Pregnancies", 0, 20, 1)
-    glucose = st.sidebar.slider("Glucose", 40, 200, 100)
-    blood_pressure = st.sidebar.slider("Blood Pressure", 30, 130, 70)
-    skin_thickness = st.sidebar.slider("Skin Thickness", 0, 100, 20)
-    insulin = st.sidebar.slider("Insulin", 0, 850, 80)
-    bmi = st.sidebar.slider("BMI", 10.0, 70.0, 30.0)
-    dpf = st.sidebar.slider("Diabetes Pedigree Function", 0.0, 3.0, 0.5)
-    age = st.sidebar.slider("Age", 10, 90, 25)
+    urination = st.radio("Do you experience frequent urination?", ["Yes", "No"])
+    thirst = st.radio("Do you feel excessive thirst?", ["Yes", "No"])
+    fatigue = st.radio("Do you often feel fatigued?", ["Yes", "No"])
+    exercise = st.selectbox("Your physical activity level:", ["Low", "Moderate", "High"])
+    family_history = st.radio("Any family history of diabetes?", ["Yes", "No"])
 
-    data = {
-        'Pregnancies': pregnancies,
-        'Glucose': glucose,
-        'BloodPressure': blood_pressure,
-        'SkinThickness': skin_thickness,
-        'Insulin': insulin,
-        'BMI': bmi,
-        'DiabetesPedigreeFunction': dpf,
-        'Age': age
-    }
+    submitted = st.form_submit_button("Check My Diabetes Risk")
 
-    return pd.DataFrame(data, index=[0])
+# Encoding function
+def encode_inputs(urination, thirst, fatigue, exercise, family_history):
+    urination_val = 1 if urination == "Yes" else 0
+    thirst_val = 1 if thirst == "Yes" else 0
+    fatigue_val = 1 if fatigue == "Yes" else 0
+    exercise_val = {"Low": 0, "Moderate": 1, "High": 2}[exercise]
+    family_val = 1 if family_history == "Yes" else 0
+    return urination_val, thirst_val, fatigue_val, exercise_val, family_val
 
-input_df = user_input()
+# BMI Calculation
+def calculate_bmi(weight, height_cm):
+    height_m = height_cm / 100
+    return round(weight / (height_m ** 2), 2)
 
-# Predict
-prediction = model.predict(input_df)[0]
-result_text = "🔴 You may be at risk of diabetes." if prediction == 1 else "🟢 You are unlikely to have diabetes."
+# Submit logic
+if submitted:
+    urin, thir, fat, ex, fam = encode_inputs(urination, thirst, fatigue, exercise, family_history)
+    bmi = calculate_bmi(weight, height)
 
-# Output
-st.subheader("Prediction Result")
-st.write(result_text)
+    input_data = pd.DataFrame([[
+        age, weight, height, urin, thir, fat, ex, fam
+    ]], columns=[
+        "Age", "Weight", "Height", "Frequent_Urination",
+        "Excessive_Thirst", "Fatigue", "Exercise_Level", "Family_History"
+    ])
 
-st.subheader("Model Accuracy")
-st.write(f"{accuracy:.2%}")
+    prediction = model.predict(input_data)[0]
 
+    st.subheader("📊 Result")
+    st.markdown(f"**Your BMI:** `{bmi}`")
+
+    if prediction == 1:
+        st.error("⚠️ You may be at **high risk** of diabetes.")
+        st.markdown("""
+        ### 🩺 Health Tips:
+        - Visit a doctor for a blood sugar test.
+        - Eat low-sugar, high-fiber meals.
+        - Exercise 30–45 mins daily.
+        - Avoid sugary drinks and junk food.
+        """)
+    else:
+        st.success("✅ You are **unlikely** to have diabetes.")
+        st.markdown("""
+        ### ✅ Prevention Tips:
+        - Stay active and eat healthy.
+        - Drink water regularly.
+        - Track your weight and lifestyle.
+        """)

@@ -3,40 +3,70 @@ import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 
-st.set_page_config(page_title="Diabetes Prediction App", layout="centered")
-st.title("🩺 Diabetes Prediction App")
-st.markdown("Enter your health details below to check your diabetes risk.")
+# ----- PAGE CONFIG -----
+st.set_page_config(
+    page_title="Diabetes Prediction App",
+    layout="centered",
+    initial_sidebar_state="auto"
+)
 
-# 1. Train model inside the app (avoids .pkl errors on deployment)
+# ----- BACKGROUND IMAGE -----
+page_bg_img = f"""
+<style>
+[data-testid="stAppViewContainer"] > .main {{
+    background-image: url("https://img.freepik.com/free-vector/health-medical-blue-background_1017-26807.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}}
+
+[data-testid="stHeader"], [data-testid="stToolbar"] {{
+    background: rgba(255, 255, 255, 0);
+}}
+
+.big-font {{
+    font-size: 28px !important;
+    font-weight: bold;
+    color: #1e90ff;
+}}
+</style>
+"""
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
+# ----- TITLE -----
+st.markdown("<h1 style='text-align: center; color: #333;'>🩺 Diabetes Prediction App</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size:18px;'>Enter your health details below to check your diabetes risk.</p>", unsafe_allow_html=True)
+
+# ----- LOAD AND TRAIN MODEL -----
 @st.cache_data
-def load_training_data():
+def load_model():
     df = pd.read_csv("user_friendly_diabetes_data.csv")
     label_cols = ["Frequent_Urination", "Excessive_Thirst", "Fatigue", "Exercise_Level", "Family_History"]
     for col in label_cols:
-        le = LabelEncoder()
-        df[col] = le.fit_transform(df[col])
+        df[col] = LabelEncoder().fit_transform(df[col])
     X = df.drop("Diabetes", axis=1)
     y = df["Diabetes"]
     model = DecisionTreeClassifier(random_state=42)
     model.fit(X, y)
     return model
 
-model = load_training_data()
+model = load_model()
 
-# 2. Input form
+# ----- FORM -----
 with st.form("diabetes_form"):
-    age = st.number_input("Age", min_value=10, max_value=100, step=1)
-    weight = st.number_input("Weight (in kg)", min_value=30, max_value=200)
-    height = st.number_input("Height (in cm)", min_value=100, max_value=250)
+    age = st.text_input("Age", placeholder="Enter your age (e.g., 45)")
+    weight = st.text_input("Weight in kg", placeholder="e.g., 70")
+    height = st.text_input("Height in cm", placeholder="e.g., 165")
 
     urination = st.radio("Do you experience frequent urination?", ["Yes", "No"])
     thirst = st.radio("Do you feel excessive thirst?", ["Yes", "No"])
     fatigue = st.radio("Do you often feel fatigued?", ["Yes", "No"])
     exercise = st.selectbox("Your physical activity level:", ["Low", "Moderate", "High"])
     family_history = st.radio("Any family history of diabetes?", ["Yes", "No"])
-    submitted = st.form_submit_button("Check My Diabetes Risk")
 
-# 3. Encoding helper
+    submitted = st.form_submit_button("🔍 Check My Diabetes Risk")
+
 def encode_inputs(urination, thirst, fatigue, exercise, family_history):
     return (
         1 if urination == "Yes" else 0,
@@ -50,24 +80,44 @@ def calculate_bmi(weight, height_cm):
     height_m = height_cm / 100
     return round(weight / (height_m ** 2), 2)
 
-# 4. On form submit
+# ----- PREDICTION -----
 if submitted:
-    urin, thir, fat, ex, fam = encode_inputs(urination, thirst, fatigue, exercise, family_history)
-    bmi = calculate_bmi(weight, height)
+    try:
+        age = int(age)
+        weight = float(weight)
+        height = float(height)
 
-    input_data = pd.DataFrame([[age, weight, height, urin, thir, fat, ex, fam]], columns=[
-        "Age", "Weight", "Height", "Frequent_Urination",
-        "Excessive_Thirst", "Fatigue", "Exercise_Level", "Family_History"
-    ])
+        urin, thir, fat, ex, fam = encode_inputs(urination, thirst, fatigue, exercise, family_history)
+        bmi = calculate_bmi(weight, height)
 
-    prediction = model.predict(input_data)[0]
+        input_data = pd.DataFrame([[age, weight, height, urin, thir, fat, ex, fam]], columns=[
+            "Age", "Weight", "Height", "Frequent_Urination",
+            "Excessive_Thirst", "Fatigue", "Exercise_Level", "Family_History"
+        ])
 
-    st.subheader("📊 Result")
-    st.markdown(f"**Your BMI:** `{bmi}`")
+        prediction = model.predict(input_data)[0]
 
-    if prediction == 1:
-        st.error("⚠️ You may be at **high risk** of diabetes.")
-        st.markdown("### 🩺 Health Tips:\n- Visit a doctor for blood sugar test.\n- Eat fiber-rich, low-sugar foods.\n- Exercise daily.\n- Avoid sugary drinks.")
-    else:
-        st.success("✅ You are **unlikely** to have diabetes.")
-        st.markdown("### ✅ Prevention Tips:\n- Maintain an active lifestyle.\n- Eat healthy.\n- Stay hydrated.\n- Get regular checkups.")
+        st.subheader("📊 Result")
+        st.markdown(f"**Your BMI:** `{bmi}`")
+
+        if prediction == 1:
+            st.markdown('<p class="big-font">⚠️ You may be at <strong>high risk</strong> of diabetes.</p>', unsafe_allow_html=True)
+            st.error("Please consult a doctor. Here are some tips:")
+            st.markdown("""
+            - Eat fiber-rich, low-sugar foods  
+            - Exercise daily  
+            - Reduce sugary drinks and processed food  
+            - Monitor blood sugar regularly  
+            """)
+        else:
+            st.markdown('<p class="big-font">✅ You are <strong>unlikely</strong> to have diabetes.</p>', unsafe_allow_html=True)
+            st.success("Keep up your healthy habits!")
+            st.markdown("""
+            - Maintain regular exercise  
+            - Keep a balanced diet  
+            - Stay hydrated  
+            - Monitor your weight  
+            """)
+
+    except:
+        st.warning("⚠️ Please enter valid numerical values for Age, Weight, and Height.")

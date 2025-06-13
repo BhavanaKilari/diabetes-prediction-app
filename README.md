@@ -46,10 +46,13 @@ It predicts whether a person is at risk of diabetes based on easily known input 
 ---
 
 ## 📁 Project Structure
+
+```text
 diabetes-prediction-app/
-├── diabetes_app_user_friendly.py # Streamlit app
-├── user_friendly_diabetes_data.csv # Training data
-└── requirements.txt # Dependencies for deployment
+│
+├── diabetes_app_user_friendly.py        # Streamlit app
+├── user_friendly_diabetes_data.csv      # Training data
+└── requirements.txt                     # Dependencies for deployment
 
 
 ---

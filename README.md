@@ -7,7 +7,7 @@ It predicts whether a person is at risk of diabetes based on easily known input 
 👉 [Click here to use the app](https://bhavanakilari-diabetes-prediction-app.streamlit.app)
 
 
-> *(Replace the above link with your actual Streamlit Cloud app URL)*
+
 
 ---
 
@@ -72,7 +72,7 @@ This app is deployed using Streamlit Cloud.
 Steps:
 
 1.Push your code to GitHub
-2.Go to [Link Text](https://streamlit.io/cloud)
+2.Go to [Streamlit](https://streamlit.io/cloud)
 3.Log in with GitHub → Click "New App"
 4.Select your repo and the main .py file
 5.Click Deploy
@@ -91,7 +91,7 @@ This project is a simplified, educational ML deployment meant for beginner-frien
 🙋‍♀️ Author
 Bhavana Kilari
 Student, East Point College of Engineering and Technology
-[Link Text](www.linkedin.com/in/bhavana-kilari)
+[Linkedin](www.linkedin.com/in/bhavana-kilari)
 
 
 

@@ -3,8 +3,10 @@
 This is a **Machine Learning-based Diabetes Prediction App** built using **Python**, **scikit-learn**, and **Streamlit**.  
 It predicts whether a person is at risk of diabetes based on easily known input attributes — no lab test values required!
 
+
 ### 🚀 Live Demo  
 👉 [Click here to use the app](https://bhavanakilari-diabetes-prediction-app.streamlit.app)
+
 
 
 

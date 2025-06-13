@@ -96,7 +96,7 @@ This project is a simplified, educational ML deployment meant for beginner-frien
 🙋‍♀️ Author
 Bhavana Kilari
 Student, East Point College of Engineering and Technology
-[Linkedin](www.linkedin.com/in/bhavana-kilari)
+
 
  
 

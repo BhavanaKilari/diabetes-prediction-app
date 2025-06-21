@@ -82,9 +82,7 @@ Steps:
 4.Select your repo and the main .py file
 5.Click Deploy
 
-## Snapshots
-![App Screenshot](screenshots/home.png)
-![Prediction Example](screenshots/result.png)
+
 
 📌## Note
 This project is a simplified, educational ML deployment meant for beginner-friendly exploration of:
